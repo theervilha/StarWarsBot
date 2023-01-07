@@ -1,8 +1,9 @@
+require('dotenv').config()
 const axios = require('axios');
 
 class Telegram {
     constructor() {
-        this.TOKEN = "";
+        this.TOKEN = process.env.TELEGRAM_TOKEN;
         this.URL = `https://api.telegram.org/bot${this.TOKEN}`;
         this.send_message_url = `${this.URL}/sendMessage`
     }

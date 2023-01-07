@@ -5,3 +5,5 @@ yarn.lock
 
 # libs
 node_modules
+
+.env
