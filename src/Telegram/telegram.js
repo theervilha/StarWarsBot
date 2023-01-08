@@ -21,13 +21,13 @@ class Telegram {
                 ]
             })
         } else {  
+            // Hide buttons interface on Telegram
             data['reply_markup'] = JSON.stringify({
-                'hide_keyboard': True
+                'hide_keyboard': true
             })
         }
         
         return axios.post(this.send_message_url, data)
-            .then((resp) => console.log('Axios Response:',resp))
             .catch(error=>{
                 console.log('!!!!!\nAxios Error:',error);
             });;

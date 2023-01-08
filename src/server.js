@@ -9,19 +9,17 @@ const port = process.env.PORT || 3001;
 const host = process.env.HOST || "localhost";
 
 
-const Telegram = require('./Telegram/telegram')
+const BotModule = require('./Bot/bot')
 
 // Rota que o telegram envia POST no webhook
-const T = new Telegram.Telegram()
+const Bot = new BotModule.Bot();
+console.log('BOT:',Bot)
 app.post("/api/handle_message", (req, res) => {
     console.log('Request Telegram Body:',req.body)
 
-    T.send_message(
-        message='Teste', 
-        chat_id=800673480, 
-        buttons=['sim', 'nao'], 
-        disable_web_page_preview={disable_web_page_preview: true}
-    )
+    Bot.get_data_from_response(req.body)
+    Bot.get_bot_response()
+    Bot.store_data()
 
 	res.status(200).send("Success!");
 });
