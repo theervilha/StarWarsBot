@@ -1,6 +1,7 @@
 require('dotenv').config()
 const axios = require('axios');
 const Telegram = require('../Telegram/telegram')
+const db = require('../Database/Database')
 
 class Bot {
 
@@ -8,6 +9,8 @@ class Bot {
         this.bot_responses = []
         this.context = ''
         this.T = new Telegram.Telegram()
+        this.DB = new db.Database();
+        this.DB.connect()
     }
 
 
@@ -28,7 +31,8 @@ class Bot {
         }
     }
 
-    get_bot_response() {
+    async get_bot_response() {
+        this.user_history = await this.DB.get_messages_by_chat_id(this.chat_id);
         this.send_message( 
             'teste',
             ['sim', 'nao'], 
@@ -37,7 +41,11 @@ class Bot {
     }    
 
     store_data() {
-        return
+        var bot_responses_str = this.bot_responses.join('\n\n\n');
+        this.DB.insert_messages(
+            [this.chat_id, this.context, this.user_message, bot_responses_str, this.created_at_user_message]
+        )
+        this.bot_responses = []
     }
 
     send_message(message, buttons=[], ...kwargs) {
