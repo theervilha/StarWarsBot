@@ -2,15 +2,22 @@ require('dotenv').config()
 const axios = require('axios');
 const Telegram = require('../Telegram/telegram')
 const db = require('../Database/Database')
+const set_extractor = require('../Extractors/SetExtractor')
+const set_recognizer = require('../Recognizers/SetRecognizer')
 
 class Bot {
 
     constructor() {
-        this.bot_responses = []
-        this.context = ''
+        this.SetExtractor = new set_extractor.SetExtractor()
+        this.sets = this.SetExtractor.extract()
+        this.SetRecognizer = new set_recognizer.SetRecognizer(this.sets)
+
         this.T = new Telegram.Telegram()
         this.DB = new db.Database();
         this.DB.connect()
+        
+        this.bot_responses = []
+        this.context = ''
     }
 
 
@@ -23,7 +30,7 @@ class Bot {
 
     get_user_message() {
         try {
-            this.user_message = this.response.message.text
+            this.user_message = this.SetExtractor.clean_text(this.response.message.text)
         } catch {
             this.user_message = ''
             this.context = ''
@@ -32,6 +39,19 @@ class Bot {
     }
 
     async get_bot_response() {
+        let sets_recognized_by_contains = this.SetRecognizer.get_sets_by_contains(this.user_message)
+        console.log('sets_recognized_by_contains', sets_recognized_by_contains)
+        console.log('sets', this.sets)
+        if ('greetings' in sets_recognized_by_contains) {
+            this.send_message( 
+                'Olá!! Eu sou o Star Wars Bot. Minha missão é te fornecer informações sobre pessoas, planetas ou naves. Sobre o que você gostaria de saber?',
+                ['sim', 'nao'], 
+                {disable_web_page_preview: true}
+            )
+            this.context = 'greetings';
+        }
+
+
         this.user_history = await this.DB.get_messages_by_chat_id(this.chat_id);
         this.send_message( 
             'teste',

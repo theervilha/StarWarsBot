@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 class SetExtractor {
-    constructor(folder='../sets') {
+    constructor(folder='./src/sets') {
         this.folder = folder
     }
 
@@ -54,7 +54,6 @@ class SetExtractor {
     }
     remove_punctuation() {
         var punctuation_regex = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`{|}~]/g;
-        console.log('text:',this.text)
         this.text = this.text.replace(punctuation_regex, '')
     }
 }
