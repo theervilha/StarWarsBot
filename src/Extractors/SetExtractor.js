@@ -10,7 +10,6 @@ class SetExtractor {
 
         this.extract_sets_content()
         Object.entries(this.sets).map(([set_name, set_values]) => {
-            set_values.map(text => console.log(text))
             let cleaned_values = set_values.map(text => this.clean_text(text));
             this.sets[set_name] = cleaned_values;
         })

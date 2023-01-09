@@ -41,7 +41,7 @@ class Bot {
     async get_bot_response() {
         let sets_recognized_by_contains = this.SetRecognizer.get_sets_by_contains(this.user_message)
         console.log('sets_recognized_by_contains', sets_recognized_by_contains)
-        console.log('sets', this.sets)
+        
         if ('greetings' in sets_recognized_by_contains) {
             this.send_message( 
                 'Olá!! Eu sou o Star Wars Bot. Minha missão é te fornecer informações sobre pessoas, planetas ou naves. Sobre o que você gostaria de saber?',
@@ -49,6 +49,42 @@ class Bot {
                 {disable_web_page_preview: true}
             )
             this.context = 'greetings';
+        } 
+        else if ('naves' in sets_recognized_by_contains) {
+            this.send_message('Certo! Estou consultando dados sobre naves...');
+            let list = await this.fetch_starships();
+            if (list.length > 0) {
+                for (let [i, row] of list.entries()) { 
+                    this.send_message(`${i+1} - ${row.name}`) 
+                    await new Promise(r => setTimeout(r, 500)); // sleep
+                };
+            } else {
+                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
+            }
+        } 
+        else if ('pessoas' in sets_recognized_by_contains) {
+            this.send_message('Certo! Estou consultando dados sobre pessoas...');
+            let list = await this.fetch_people();
+            if (list.length > 0) {
+                for (let [i, row] of list.entries()) { 
+                    this.send_message(`${i+1} - ${row.name}`) 
+                    await new Promise(r => setTimeout(r, 500)); // sleep
+                };
+            } else {
+                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
+            }
+        } 
+        else if ('planetas' in sets_recognized_by_contains) {
+            this.send_message('Certo! Estou consultando dados sobre planetas...');
+            let list = await this.fetch_planets();
+            if (list.length > 0) {
+                for (let [i, row] of list.entries()) { 
+                    this.send_message(`${i+1} - ${row.name}`) 
+                    await new Promise(r => setTimeout(r, 500)); // sleep
+                };
+            } else {
+                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
+            }
         }
 
 
@@ -59,6 +95,24 @@ class Bot {
             {disable_web_page_preview: true}
         )
     }    
+
+    async fetch_starships() {
+        const res = await fetch('https://swapi.dev/api/starships?format=json');
+        const data = await res.json()
+        return data.results;
+    }
+    
+    async fetch_people() {
+        const res = await fetch('https://swapi.dev/api/people?format=json');
+        const data = await res.json()
+        return data.results;
+    }
+    
+    async fetch_planets() {
+        const res = await fetch('https://swapi.dev/api/planets?format=json');
+        const data = await res.json()
+        return data.results;
+    }
 
     store_data() {
         var bot_responses_str = this.bot_responses.join('\n\n\n');
