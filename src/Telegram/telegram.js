@@ -26,11 +26,13 @@ class Telegram {
                 'hide_keyboard': true
             })
         }
+        console.log('sending data:',data);
         
-        return axios.post(this.send_message_url, data)
+        return console.log('API SEND MESSAGE RESPONSE:\n', axios.post(this.send_message_url, data)
+            .then(data => console.log('REALLY RESPONSE:\n',data))
             .catch(error=>{
                 console.log('!!!!!\nAxios Error:',error);
-            });;
+            }))
     }
 }
 

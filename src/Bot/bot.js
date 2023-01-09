@@ -1,5 +1,6 @@
 require('dotenv').config()
 const axios = require('axios');
+
 const Telegram = require('../Telegram/telegram')
 const db = require('../Database/Database')
 const set_extractor = require('../Extractors/SetExtractor')
@@ -8,6 +9,7 @@ const set_recognizer = require('../Recognizers/SetRecognizer')
 class Bot {
 
     constructor() {
+        console.log('pathBOT:',process.argv);
         this.SetExtractor = new set_extractor.SetExtractor()
         this.sets = this.SetExtractor.extract()
         this.SetRecognizer = new set_recognizer.SetRecognizer(this.sets)
@@ -97,20 +99,20 @@ class Bot {
     }    
 
     async fetch_starships() {
-        const res = await fetch('https://swapi.dev/api/starships?format=json');
-        const data = await res.json()
+        const res = await axios.get('https://swapi.dev/api/starships?format=json');
+        const data = await res.data;
         return data.results;
     }
     
     async fetch_people() {
-        const res = await fetch('https://swapi.dev/api/people?format=json');
-        const data = await res.json()
+        const res = await axios.get('https://swapi.dev/api/people?format=json');
+        const data = await res.data;
         return data.results;
     }
     
     async fetch_planets() {
-        const res = await fetch('https://swapi.dev/api/planets?format=json');
-        const data = await res.json()
+        const res = await axios.get('https://swapi.dev/api/planets?format=json');
+        const data = await res.data;
         return data.results;
     }
 

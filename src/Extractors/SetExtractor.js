@@ -1,8 +1,15 @@
 const fs = require('fs');
+const path = require('path');
 
 class SetExtractor {
-    constructor(folder='./src/sets') {
-        this.folder = folder
+    constructor(folder='src/sets') {
+        //joining path of directory 
+        //__dirname = path.resolve()
+        this.folder = path.resolve('./src', 'sets')
+        //this.folder = path.join(__dirname, 'src/sets');
+        console.log('########## FOLDER:',this.folder);
+        console.log('SetExtractorconstructor:',process.argv);
+        //this.folder = folder
     }
 
     extract(remove_accents=false) {

@@ -6,10 +6,9 @@ app.use(cors());
 app.use(express.json());
 
 const port = process.env.PORT || 3001;
-//const host = process.env.HOST || "localhost";
 
-
-const BotModule = require('./Bot/bot')
+const BotModule = require('./src/Bot/bot')
+console.log('path:',process.argv);
 
 // Rota que o telegram envia POST no webhook
 const Bot = new BotModule.Bot();
@@ -24,10 +23,6 @@ app.post("/api/handle_message", (req, res) => {
 app.use((req, res) => {
 	res.status(404).send("API don´t handle this route");
 });
-
-// app.listen(port, host, () => {
-// 	console.log(`API listening on ${host} with port ${port}`);
-// });
 
 app.listen(port, () => {
 	console.log(`API listening with port ${port}`);

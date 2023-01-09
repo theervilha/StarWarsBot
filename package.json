@@ -2,13 +2,13 @@
   "name": "starwarsbot",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "index.js",
   "engines": {
     "node": "14.x"
   },
   "scripts": {
-    "dev": "nodemon src/server.js -w ./src",
-    "start": "node src/server.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
