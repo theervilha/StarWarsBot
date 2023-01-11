@@ -33,6 +33,9 @@ class SetExtractor {
             const files = fs.readdirSync(this.folder)
         } catch {
             console.log('FILES ERROR.')
+            __dirname = path.resolve()
+            this.folder2 = path.join(__dirname, 'src/sets');
+            console.log('########## FOLDER2:',this.folder2);
             const files = fs.readdirSync(this.folder2)
         }
         files.forEach(filename => {
