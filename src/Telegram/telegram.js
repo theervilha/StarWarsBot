@@ -8,7 +8,7 @@ class Telegram {
         this.send_message_url = `${this.URL}/sendMessage`
     }
 
-    send_message(message, chat_id, buttons=[], ...kwargs) {  
+    async send_message(message, chat_id, buttons=[], ...kwargs) {  
         let data = {'text': message, 'chat_id': chat_id, "parse_mode": "HTML"}
         kwargs.forEach((arg) => {
             data = {...data, ...arg}
@@ -28,11 +28,10 @@ class Telegram {
         }
         console.log('sending data:',data);
         
-        return console.log('API SEND MESSAGE RESPONSE:\n', axios.post(this.send_message_url, data)
-            .then(data => console.log('REALLY RESPONSE:\n',data))
+        return axios.post(this.send_message_url, data)
             .catch(error=>{
                 console.log('!!!!!\nAxios Error:',error);
-            }))
+            })
     }
 }
 

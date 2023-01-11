@@ -23,11 +23,12 @@ class Bot {
     }
 
 
-    get_data_from_response(response) {
+    async get_data_from_response(response) {
         this.response = response
         this.chat_id = this.response.message.chat.id
         this.created_at_user_message = new Date()
         this.get_user_message()
+        this.user_history = await this.DB.get_messages_by_chat_id(this.chat_id);
     }
 
     get_user_message() {
@@ -45,7 +46,7 @@ class Bot {
         console.log('sets_recognized_by_contains', sets_recognized_by_contains)
         
         if ('greetings' in sets_recognized_by_contains) {
-            this.send_message( 
+            await this.send_message( 
                 'Olá!! Eu sou o Star Wars Bot. Minha missão é te fornecer informações sobre pessoas, planetas ou naves. Sobre o que você gostaria de saber?',
                 ['sim', 'nao'], 
                 {disable_web_page_preview: true}
@@ -53,50 +54,36 @@ class Bot {
             this.context = 'greetings';
         } 
         else if ('naves' in sets_recognized_by_contains) {
-            this.send_message('Certo! Estou consultando dados sobre naves...');
-            let list = await this.fetch_starships();
-            if (list.length > 0) {
-                for (let [i, row] of list.entries()) { 
-                    this.send_message(`${i+1} - ${row.name}`) 
-                    await new Promise(r => setTimeout(r, 500)); // sleep
-                };
-            } else {
-                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
-            }
+            this.fetch_starwars_api('naves');
         } 
         else if ('pessoas' in sets_recognized_by_contains) {
-            this.send_message('Certo! Estou consultando dados sobre pessoas...');
-            let list = await this.fetch_people();
-            if (list.length > 0) {
-                for (let [i, row] of list.entries()) { 
-                    this.send_message(`${i+1} - ${row.name}`) 
-                    await new Promise(r => setTimeout(r, 500)); // sleep
-                };
-            } else {
-                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
-            }
+            this.fetch_starwars_api('pessoas');
         } 
         else if ('planetas' in sets_recognized_by_contains) {
-            this.send_message('Certo! Estou consultando dados sobre planetas...');
-            let list = await this.fetch_planets();
-            if (list.length > 0) {
-                for (let [i, row] of list.entries()) { 
-                    this.send_message(`${i+1} - ${row.name}`) 
-                    await new Promise(r => setTimeout(r, 500)); // sleep
-                };
-            } else {
-                this.send_message("Infelizmente eu não consegui extrair nenhum dado :(.")
-            }
+            this.fetch_starwars_api('planetas');
+        }
+    }    
+
+    async fetch_starwars_api(data_type) {
+        let functions_per_data_type = {
+            'naves': this.fetch_starships,
+            'pessoas': this.fetch_people,
+            'planetas': this.fetch_planets,
         }
 
+        await this.send_message(`Certo! Estou consultando dados sobre ${data_type}...`);
 
-        this.user_history = await this.DB.get_messages_by_chat_id(this.chat_id);
-        this.send_message( 
-            'teste',
-            ['sim', 'nao'], 
-            {disable_web_page_preview: true}
-        )
-    }    
+        let list = await functions_per_data_type[data_type]();
+        if (list.length > 0) {
+            let send_string = "Encontrei os seguintes dados:\n";
+            for (let [i, row] of list.entries()) { 
+                send_string += `${i+1} - ${row.name}\n`;
+            };
+            await this.send_message(send_string)
+        } else {
+            await this.send_message("Infelizmente eu não consegui extrair nada :(.")
+        }
+    }
 
     async fetch_starships() {
         const res = await axios.get('https://swapi.dev/api/starships?format=json');
@@ -124,8 +111,8 @@ class Bot {
         this.bot_responses = []
     }
 
-    send_message(message, buttons=[], ...kwargs) {
-        this.T.send_message(message, this.chat_id, buttons=buttons, ...kwargs);
+    async send_message(message, buttons=[], ...kwargs) {
+        await this.T.send_message(message, this.chat_id, buttons=buttons, ...kwargs);
         this.bot_responses.push(message);
     }
 }
