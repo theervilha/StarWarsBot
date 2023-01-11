@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 
 class SetExtractor {
-    constructor(folder='sets') {
-        this.folder = path.resolve('./src', folder)
+    constructor(folder='src/sets') {
+        //joining path of directory 
+        this.folder = path.resolve('./src', 'sets')
+        console.log('########## FOLDER:',this.folder);
+        console.log('SetExtractorconstructor:',process.argv);
     }
 
     extract(remove_accents=false) {
@@ -26,7 +29,12 @@ class SetExtractor {
             }
          */
         this.sets = {}
-        const files = fs.readdirSync(this.folder)
+        try {
+            const files = fs.readdirSync(this.folder)
+        } catch {
+            console.log('FILES ERROR.')
+            const files = fs.readdirSync(this.folder2)
+        }
         files.forEach(filename => {
             let file_values = fs.readFileSync(`${this.folder}/${filename}`, 'utf8').split('\n')
             filename = filename.replace('.txt', '')

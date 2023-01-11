@@ -9,7 +9,6 @@ const set_recognizer = require('../Recognizers/SetRecognizer')
 class Bot {
 
     constructor() {
-        console.log('pathBOT:',process.argv);
         this.SetExtractor = new set_extractor.SetExtractor()
         this.sets = this.SetExtractor.extract()
         this.SetRecognizer = new set_recognizer.SetRecognizer(this.sets)
