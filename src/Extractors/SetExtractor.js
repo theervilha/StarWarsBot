@@ -6,7 +6,7 @@ class SetExtractor {
         this.folder = path.resolve('./src', folder)
     }
 
-    extract(remove_accents=false) {
+    extract(remove_accents=true) {
         this.remove_accents = remove_accents
 
         this.extract_sets_content()
@@ -28,7 +28,9 @@ class SetExtractor {
         this.sets = {}
         const files = fs.readdirSync(this.folder)
         files.forEach(filename => {
-            let file_values = fs.readFileSync(`${this.folder}/${filename}`, 'utf8').split('\n')
+            let file_path = path.resolve(this.folder, filename);
+            //let file_values = fs.readFileSync(`${this.folder}/${filename}`, 'utf8').split('\n')
+            let file_values = fs.readFileSync(file_path, 'utf8').split('\n')
             filename = filename.replace('.txt', '')
             this.sets[filename] = file_values
         })
@@ -40,13 +42,14 @@ class SetExtractor {
          * > new extractor.FileExtractor().clean_text(text)
             OUTPUT: 'OlA tudo bem Chao cabao Removida a pontuacao os espacos extras e os acentos'
          */
-        this.text = text
+        this.text = text;
+        this.text = this.text;
         if (this.remove_accents) {this.text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")}
         
         this.remove_punctuation()
         this.remove_extra_spaces()
-        
-        return this.text
+
+        return this.text.toLowerCase()
     }
 
     remove_extra_spaces() {

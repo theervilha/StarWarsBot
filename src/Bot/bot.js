@@ -28,42 +28,97 @@ class Bot {
         this.created_at_user_message = new Date()
         this.get_user_message()
         this.user_history = await this.DB.get_messages_by_chat_id(this.chat_id);
+        this.context = ''
     }
 
-    get_user_message() {
+    async get_user_message() {
         try {
-            this.user_message = this.SetExtractor.clean_text(this.response.message.text)
+            this.user_message = await this.SetExtractor.clean_text(this.response.message.text)
         } catch {
             this.user_message = ''
-            this.context = ''
             print('!!!!!erro ao pegar resposta')
         }
     }
 
     async get_bot_response() {
-        let sets_recognized_by_contains = this.SetRecognizer.get_sets_by_contains(this.user_message)
+        let sets_recognized_by_contains = await this.SetRecognizer.get_sets_by_contains(this.user_message)
         console.log('sets_recognized_by_contains', sets_recognized_by_contains)
         
         if ('greetings' in sets_recognized_by_contains) {
-            await this.send_message( 
-                'Olá!! Eu sou o Star Wars Bot. Minha missão é te fornecer informações sobre pessoas, planetas ou naves. Sobre o que você gostaria de saber?',
-                ['sim', 'nao'], 
-                {disable_web_page_preview: true}
-            )
+            await this.send_message('Olá!! Eu sou o Star Wars Bot. Minha missão é te fornecer informações sobre pessoas, planetas ou naves. Sobre o que você gostaria de saber?')
             this.context = 'greetings';
         } 
         else if ('naves' in sets_recognized_by_contains) {
-            this.fetch_starwars_api('naves');
+            await this.fetch_starwars_and_send_message('naves');
+            this.context = 'fetch_starships';
+            await this.send_message("Você gostaria de fazer outra consulta?");
         } 
         else if ('pessoas' in sets_recognized_by_contains) {
-            this.fetch_starwars_api('pessoas');
+            await this.fetch_starwars_and_send_message('pessoas');
+            this.context = 'fetch_people';
+            await this.send_message("Você gostaria de fazer outra consulta?");
         } 
         else if ('planetas' in sets_recognized_by_contains) {
-            this.fetch_starwars_api('planetas');
+            await this.fetch_starwars_and_send_message('planetas');
+            this.context = 'fetch_planets';
+            await this.send_message("Você gostaria de fazer outra consulta?");
+        } else if ( Object.keys(sets_recognized_by_contains).length === 0) {
+            this.context = 'not_handled'
+            console.log('1 - user_message',this.user_message,'caiu no not handled')
+        }
+
+
+        if (this.user_history.length > 0) {
+            let last_context = this.user_history[this.user_history.length -1].context;
+            console.log('last history:',this.user_history[this.user_history.length -1])
+
+            // If last context was about fetching data from starwars, check this:
+            if (['fetch_starships', 'fetch_people', 'fetch_planets'].includes(last_context)) {
+                if ('confirmacao' in sets_recognized_by_contains) {
+                    this.context = 'wanna_fetch_data'
+                } else if ('negacao' in sets_recognized_by_contains) {
+                    this.context = 'finish_conversation'
+                } else {
+                    this.context = 'not_handled'
+                    console.log('2 - user_message',this.user_message,'caiu no not handled')
+                }
+            }
+        }
+
+        if (this.context == 'not_handled') {
+            await this.send_message('Desculpe, não entendi. Você gostaria de fazer uma consulta ou encerrar a conversa?');
+        }
+
+        if (this.user_history.length > 0) {
+            let last_context = this.user_history[this.user_history.length -1].context;
+            // If the bot didn't understood last message, verify the new message here.
+            if (last_context == 'not_handled') {
+                if ('consultar' in sets_recognized_by_contains) {
+                    this.context = 'wanna_fetch_data'
+                } else if ('encerrar' in sets_recognized_by_contains) {
+                    this.context = 'finish_conversation'
+                } else if (this.context == 'not_handled') {
+                    this.context = 'not_handled'
+                    console.log('3 - user_message',this.user_message,'caiu no not handled')
+                }
+            }
+        }
+        
+        if (this.context == 'wanna_fetch_data') {
+            await this.send_message("Legal 🤩! \nPosso te fornecer informações sobre personagens, planetas ou naves. Sobre o que você gostaria de saber?")
+        }
+
+        if (this.context == 'finish_conversation') {
+            await this.send_message("Tchauzinho geek 😁! Qualquer coisa me chama aqui para eu trazer mais informações sobre o mundo de Star Wars. Obrigado pela preferência, até mais!")
         }
     }    
 
-    async fetch_starwars_api(data_type) {
+    async send_message(message, buttons=[], ...kwargs) {
+        await this.T.send_message(message, this.chat_id, buttons=buttons, ...kwargs);
+        this.bot_responses.push(message);
+    }
+
+    async fetch_starwars_and_send_message(data_type) {
         let functions_per_data_type = {
             'naves': this.fetch_starships,
             'pessoas': this.fetch_people,
@@ -110,10 +165,6 @@ class Bot {
         this.bot_responses = []
     }
 
-    async send_message(message, buttons=[], ...kwargs) {
-        await this.T.send_message(message, this.chat_id, buttons=buttons, ...kwargs);
-        this.bot_responses.push(message);
-    }
 }
 
 module.exports = {Bot}

@@ -12,3 +12,4 @@ seres
 criaturas
 caras
 galera
+bonecos

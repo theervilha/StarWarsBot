@@ -1,2 +1,4 @@
 planetas
 planeta
+stars
+estrelas
