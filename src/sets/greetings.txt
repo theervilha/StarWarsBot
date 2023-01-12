@@ -1,11 +1,9 @@
 oi
 bom dia
 boa tarde
-olá
 ola
 hey
 hi
-tudo bem?
+tudo bem
 hello
 start
-/start

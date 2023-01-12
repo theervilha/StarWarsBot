@@ -12,7 +12,7 @@ const BotModule = require('./src/Bot/bot')
 // Rota que o telegram envia POST no webhook
 const Bot = new BotModule.Bot();
 app.post("/api/handle_message", async (req, res) => {
-    Bot.get_data_from_response(req.body)
+    await Bot.get_data_from_response(req.body)
     await Bot.get_bot_response()
     Bot.store_data()
 

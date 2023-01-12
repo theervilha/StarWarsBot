@@ -33,6 +33,7 @@ class SetRecognizer extends base.BaseRecognizer {
          * contains {'greetings': ['ola', 'tudo bem']},
          * the function returns { greetings: [ 'ola', 'tudo bem' ] }, 
          */
+        console.log('olha, a user_message é',user_message)
         return Object.keys(this.sets).reduce((filtered, setname) => {
             let setvalues = this.sets[setname];
             let contains_values = this.get_contains(setvalues, user_message)

@@ -26,7 +26,6 @@ class Telegram {
                 'hide_keyboard': true
             })
         }
-        console.log('sending data:',data);
         
         return axios.post(this.send_message_url, data)
             .catch(error=>{
