@@ -3,7 +3,7 @@ const path = require('path');
 
 class SetExtractor {
     constructor(folder='sets') {
-        this.folder = path.resolve('./src', folder)
+        this.folder = process.cwd() + "/" + `src/${folder}`
     }
 
     extract(remove_accents=true) {
@@ -28,8 +28,7 @@ class SetExtractor {
         this.sets = {}
         const files = fs.readdirSync(this.folder)
         files.forEach(filename => {
-            let file_path = path.resolve(this.folder, filename);
-            //let file_values = fs.readFileSync(`${this.folder}/${filename}`, 'utf8').split('\n')
+            let file_path = this.folder + "/" + filename
             let file_values = fs.readFileSync(file_path, 'utf8').split('\n')
             filename = filename.replace('.txt', '')
             this.sets[filename] = file_values
